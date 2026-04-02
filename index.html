@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>포타 기록</title>
+    <style>
+        :root {
+            --primary-color: #5dcecc;
+            --dark-color: #191F36;
+            --bg-color: #f8f9fa;
+        }
+        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-color); padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { max-width: 600px; width: 100%; display: flex; flex-direction: column; gap: 16px; }
+
+        /* Input section */
+        .input-section { background: white; padding: 22px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        .section-title { color: var(--dark-color); font-size: 1rem; font-weight: 700; margin-bottom: 12px; }
+        input, textarea { width: 100%; padding: 10px; margin-top: 6px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit; font-size: 0.9rem; outline: none; }
+        input:focus, textarea:focus { border-color: #bbb; }
+        textarea { resize: vertical; }
+        .add-btn { width: 100%; padding: 12px; background: var(--dark-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; font-size: 0.95rem; }
+        .add-btn:hover { opacity: 0.85; }
+
+        /* Search section */
+        .search-section { background: white; padding: 22px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        .search-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+        .search-header-title { font-size: 0.95rem; font-weight: 700; color: var(--dark-color); }
+        .count-badge { font-size: 0.85rem; color: #888; flex: 1; }
+        .dice-btn { background: none; border: none; cursor: pointer; padding: 2px; display: flex; align-items: center; color: #999; }
+        .dice-btn:hover { color: var(--dark-color); }
+        .search-bar { width: 100%; padding: 10px; border: none; border-radius: 8px; box-sizing: border-box; font-family: inherit; font-size: 0.9rem; background: #f5f6f8; outline: none; margin-bottom: 4px; }
+
+        /* Quote cards */
+        .quote-card { background: #fff; padding: 15px; margin-top: 12px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); position: relative; padding-right: 88px; }
+        .quote-text { font-size: 0.9rem; font-weight: normal; margin-bottom: 8px; line-height: 1.6; color: #222; }
+        .quote-info { font-size: 0.85rem; color: #444; margin-bottom: 6px; }
+        .tag-container { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+        .tag { display: inline-block; background: #e8f7f7; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; color: var(--primary-color); }
+
+        .card-actions { position: absolute; top: 12px; right: 10px; display: flex; align-items: center; gap: 6px; }
+        .icon-btn { background: none; border: none; cursor: pointer; padding: 2px; display: flex; align-items: center; color: #ccc; }
+        .icon-btn:hover { color: #999; }
+        .icon-btn.liked { color: #ff6b6b; }
+        .icon-btn.editing { color: var(--dark-color); }
+        .delete-btn { background: none; border: none; cursor: pointer; padding: 2px; display: flex; align-items: center; color: #ccc; }
+        .delete-btn:hover { color: #aaa; }
+
+        .edit-form { margin-top: 12px; border-top: 1px solid #eee; padding-top: 10px; }
+        .edit-form input, .edit-form textarea { margin-top: 5px; }
+        .save-edit-btn { width: 100%; padding: 9px; background: var(--dark-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 8px; font-size: 0.9rem; }
+        .save-edit-btn:hover { opacity: 0.85; }
+
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.45); z-index: 999; justify-content: center; align-items: center; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: white; border-radius: 15px; padding: 28px 25px 22px; max-width: 400px; width: 90%; position: relative; }
+        .modal-close { position: absolute; top: 12px; right: 14px; background: none; border: none; cursor: pointer; color: #aaa; padding: 0; display: flex; align-items: center; }
+        .modal-close:hover { color: #555; }
+        .modal-quote-text { font-size: 0.95rem; line-height: 1.7; color: #222; margin-bottom: 10px; }
+        .modal-quote-info { font-size: 0.85rem; color: #555; }
+        .modal-tags { margin-top: 8px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Input Section -->
+    <div class="input-section">
+        <div class="section-title">명대사 추가</div>
+        <input type="text" id="author" placeholder="작가명">
+        <input type="text" id="title" placeholder="포타 이름">
+        <textarea id="quote" rows="3" placeholder="명대사 입력"></textarea>
+        <input type="text" id="tags" placeholder="#태그">
+        <button class="add-btn" onclick="addQuote()">추가</button>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-section">
+        <div class="search-header">
+            <span class="search-header-title">포타 명대사 검색</span>
+            <span class="count-badge" id="totalCount">총 0개</span>
+            <button class="dice-btn" onclick="showRandom()" title="랜덤 명대사">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="3"/>
+                    <circle cx="8.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"/>
+                    <circle cx="15.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"/>
+                    <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/>
+                    <circle cx="8.5" cy="15.5" r="1.2" fill="currentColor" stroke="none"/>
+                    <circle cx="15.5" cy="15.5" r="1.2" fill="currentColor" stroke="none"/>
+                </svg>
+            </button>
+        </div>
+        <input type="text" id="search" class="search-bar" placeholder="포타 이름/키워드/해시태그/작가명/본문 입력" onkeyup="displayQuotes()">
+        <div id="quoteList"></div>
+    </div>
+
+</div>
+
+<!-- Random Modal -->
+<div class="modal-overlay" id="randomModal" onclick="closeModalOutside(event)">
+    <div class="modal">
+        <button class="modal-close" onclick="document.getElementById('randomModal').classList.remove('active')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <div id="randomContent"></div>
+    </div>
+</div>
+
+<script>
+    let quotes = JSON.parse(localStorage.getItem('myQuotes')) || [];
+    let liked = JSON.parse(localStorage.getItem('myLiked')) || [];
+
+    const SVG_HEART_EMPTY = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+    const SVG_HEART_FILLED = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+    const SVG_PENCIL = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+    const SVG_CLOSE = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+
+    displayQuotes();
+
+    function parseTags(tagStr) {
+        if (!tagStr) return [];
+        return tagStr.split('#').map(t => t.trim()).filter(t => t.length > 0);
+    }
+
+    function addQuote() {
+        const author = document.getElementById('author').value.trim();
+        const title = document.getElementById('title').value.trim();
+        const quote = document.getElementById('quote').value.trim();
+        const tags = document.getElementById('tags').value.trim();
+
+        if (!author || !quote) return alert("작가명과 명대사는 필수입니다!");
+
+        const newQuote = { id: Date.now(), author, title, quote, tags };
+        quotes.push(newQuote);
+        localStorage.setItem('myQuotes', JSON.stringify(quotes));
+
+        document.getElementById('author').value = '';
+        document.getElementById('title').value = '';
+        document.getElementById('quote').value = '';
+        document.getElementById('tags').value = '';
+        displayQuotes();
+    }
+
+    function displayQuotes() {
+        const searchTerm = document.getElementById('search').value.toLowerCase();
+        const list = document.getElementById('quoteList');
+        list.innerHTML = '';
+
+        document.getElementById('totalCount').textContent = `총 ${quotes.length}개`;
+
+        const filtered = quotes.filter(q => {
+            const tagStr = (q.tags || '').toLowerCase();
+            return (
+                (q.title || '').toLowerCase().includes(searchTerm) ||
+                (q.author || '').toLowerCase().includes(searchTerm) ||
+                tagStr.includes(searchTerm) ||
+                (q.quote || '').toLowerCase().includes(searchTerm)
+            );
+        });
+
+        [...filtered].reverse().forEach(q => {
+            const isLiked = liked.includes(q.id);
+            const tags = parseTags(q.tags);
+            const tagHTML = tags.map(t => `<span class="tag">#${t}</span>`).join('');
+            const infoText = [q.author, q.title].filter(Boolean).join(' | ');
+
+            list.innerHTML += `
+                <div class="quote-card" id="card-${q.id}">
+                    <div class="card-actions">
+                        <button class="icon-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike(${q.id})" title="좋아요">${isLiked ? SVG_HEART_FILLED : SVG_HEART_EMPTY}</button>
+                        <button class="icon-btn" onclick="toggleEdit(${q.id})" id="edit-btn-${q.id}" title="수정">${SVG_PENCIL}</button>
+                        <button class="delete-btn" onclick="deleteQuote(${q.id})" title="삭제">${SVG_CLOSE}</button>
+                    </div>
+                    <div class="quote-text">${q.quote}</div>
+                    <div class="quote-info">${infoText}</div>
+                    <div class="tag-container">${tagHTML}</div>
+                    <div class="edit-form" id="edit-${q.id}" style="display:none;">
+                        <input type="text" id="ea-${q.id}" value="${escapeAttr(q.author || '')}" placeholder="작가명">
+                        <input type="text" id="et-${q.id}" value="${escapeAttr(q.title || '')}" placeholder="포타 이름">
+                        <textarea id="eq-${q.id}" rows="3" placeholder="명대사 입력">${escapeText(q.quote)}</textarea>
+                        <input type="text" id="eg-${q.id}" value="${escapeAttr(q.tags || '')}" placeholder="#태그">
+                        <button class="save-edit-btn" onclick="saveEdit(${q.id})">저장</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function escapeAttr(str) {
+        return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function escapeText(str) {
+        return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function toggleLike(id) {
+        if (liked.includes(id)) {
+            liked = liked.filter(l => l !== id);
+        } else {
+            liked.push(id);
+        }
+        localStorage.setItem('myLiked', JSON.stringify(liked));
+        displayQuotes();
+    }
+
+    function toggleEdit(id) {
+        const editForm = document.getElementById(`edit-${id}`);
+        const editBtn = document.getElementById(`edit-btn-${id}`);
+        const isHidden = editForm.style.display === 'none';
+        editForm.style.display = isHidden ? 'block' : 'none';
+        editBtn.classList.toggle('editing', isHidden);
+    }
+
+    function saveEdit(id) {
+        const newAuthor = document.getElementById(`ea-${id}`).value.trim();
+        const newTitle = document.getElementById(`et-${id}`).value.trim();
+        const newQuote = document.getElementById(`eq-${id}`).value.trim();
+        const newTags = document.getElementById(`eg-${id}`).value.trim();
+
+        if (!newAuthor || !newQuote) return alert("작가명과 명대사는 필수입니다!");
+
+        quotes = quotes.map(q => q.id === id
+            ? { ...q, author: newAuthor, title: newTitle, quote: newQuote, tags: newTags }
+            : q
+        );
+        localStorage.setItem('myQuotes', JSON.stringify(quotes));
+        displayQuotes();
+    }
+
+    function deleteQuote(id) {
+        if (confirm("이 대사를 삭제할까요?")) {
+            quotes = quotes.filter(q => q.id !== id);
+            liked = liked.filter(l => l !== id);
+            localStorage.setItem('myQuotes', JSON.stringify(quotes));
+            localStorage.setItem('myLiked', JSON.stringify(liked));
+            displayQuotes();
+        }
+    }
+
+    function showRandom() {
+        if (quotes.length === 0) return;
+        const q = quotes[Math.floor(Math.random() * quotes.length)];
+        const tags = parseTags(q.tags);
+        const tagHTML = tags.map(t => `<span class="tag">#${t}</span>`).join('');
+        const infoText = [q.author, q.title].filter(Boolean).join(' | ');
+
+        document.getElementById('randomContent').innerHTML = `
+            <div class="modal-quote-text">${q.quote}</div>
+            <div class="modal-quote-info">${infoText}</div>
+            <div class="modal-tags tag-container">${tagHTML}</div>
+        `;
+        document.getElementById('randomModal').classList.add('active');
+    }
+
+    function closeModalOutside(event) {
+        if (event.target === document.getElementById('randomModal')) {
+            document.getElementById('randomModal').classList.remove('active');
+        }
+    }
+</script>
+
+</body>
+</html>
