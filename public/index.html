@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -8,63 +7,121 @@
     <style>
         :root {
             --primary-color: #5dcecc;
+            --dark-color: #191F36;
             --bg-color: #f8f9fa;
         }
         body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-color); padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .container { max-width: 600px; width: 100%; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: var(--primary-color); font-size: 1.5rem; }
+
+        .section-title { color: var(--dark-color); font-size: 1rem; font-weight: 700; margin-bottom: 12px; }
 
         .input-group { margin-bottom: 15px; }
-        input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        button:hover { opacity: 0.9; }
+        input, textarea { width: 100%; padding: 10px; margin-top: 6px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit; font-size: 0.9rem; }
+        textarea { resize: vertical; }
 
-        .search-bar { margin: 20px 0; padding: 10px; border: 2px solid var(--primary-color); }
+        .add-btn { width: 100%; padding: 12px; background: var(--dark-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; font-size: 0.95rem; }
+        .add-btn:hover { opacity: 0.85; }
 
-        .quote-card { background: #fff; border-left: 5px solid var(--primary-color); padding: 15px; margin-bottom: 15px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; }
-        .quote-text { font-size: 1.1rem; font-weight: 600; margin-bottom: 10px; line-height: 1.5; }
-        .quote-info { font-size: 0.85rem; color: #666; }
-        .tag { display: inline-block; background: #eee; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; margin-top: 5px; color: var(--primary-color); }
-        .delete-btn { position: absolute; top: 10px; right: 10px; color: #ccc; cursor: pointer; border: none; background: none; }
+        hr { border: none; border-top: 1px solid #eee; margin: 20px 0; }
+
+        .search-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .search-header-title { font-size: 0.95rem; font-weight: 700; color: var(--dark-color); }
+        .count-badge { font-size: 0.85rem; color: #888; flex: 1; }
+        .dice-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; padding: 0; line-height: 1; }
+        .dice-btn:hover { opacity: 0.7; }
+
+        .search-bar { width: 100%; padding: 10px; border: 2px solid var(--primary-color); border-radius: 8px; box-sizing: border-box; font-family: inherit; font-size: 0.9rem; margin-bottom: 15px; }
+
+        .quote-card { background: #fff; padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.07); position: relative; padding-right: 90px; }
+        .quote-text { font-size: 0.9rem; font-weight: normal; margin-bottom: 8px; line-height: 1.6; color: #222; }
+        .quote-info { font-size: 0.85rem; color: #444; margin-bottom: 6px; }
+        .tag-container { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+        .tag { display: inline-block; background: #e8f7f7; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; color: var(--primary-color); }
+
+        .card-actions { position: absolute; top: 10px; right: 10px; display: flex; align-items: center; gap: 6px; }
+        .icon-btn { background: none; border: none; cursor: pointer; font-size: 1rem; padding: 2px; line-height: 1; color: #ccc; }
+        .icon-btn:hover { color: #999; }
+        .icon-btn.liked { color: #ff6b6b; }
+        .icon-btn.editing { color: var(--dark-color); }
+        .delete-btn { background: none; border: none; cursor: pointer; font-size: 0.85rem; color: #ccc; padding: 2px; line-height: 1; }
+        .delete-btn:hover { color: #aaa; }
+
+        .edit-form { margin-top: 12px; border-top: 1px solid #eee; padding-top: 10px; }
+        .edit-form input, .edit-form textarea { margin-top: 5px; }
+        .save-edit-btn { width: 100%; padding: 9px; background: var(--dark-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 8px; font-size: 0.9rem; }
+        .save-edit-btn:hover { opacity: 0.85; }
+
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.45); z-index: 999; justify-content: center; align-items: center; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: white; border-radius: 15px; padding: 28px 25px 22px; max-width: 400px; width: 90%; position: relative; }
+        .modal-close { position: absolute; top: 12px; right: 14px; background: none; border: none; font-size: 1.1rem; cursor: pointer; color: #aaa; padding: 0; }
+        .modal-close:hover { color: #555; }
+        .modal-quote-text { font-size: 0.95rem; line-height: 1.7; color: #222; margin-bottom: 10px; }
+        .modal-quote-info { font-size: 0.85rem; color: #555; }
+        .modal-tags { margin-top: 8px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>포타 기록</h1>
+    <div class="section-title">명대사 추가</div>
 
     <div class="input-group">
-        <input type="text" id="title" placeholder="제목">
         <input type="text" id="author" placeholder="작가명">
-        <textarea id="quote" rows="3" placeholder="명대사"></textarea>
-        <input type="text" id="tags" placeholder="태그">
-        <button onclick="addQuote()">저장하기</button>
+        <input type="text" id="title" placeholder="포타 이름">
+        <textarea id="quote" rows="3" placeholder="명대사 입력"></textarea>
+        <input type="text" id="tags" placeholder="#태그">
+        <button class="add-btn" onclick="addQuote()">추가</button>
     </div>
 
     <hr>
 
-    <input type="text" id="search" class="search-bar" placeholder="제목, 작가, 태그로 검색해보세요!" onkeyup="displayQuotes()">
+    <div class="search-header">
+        <span class="search-header-title">포타 명대사 검색</span>
+        <span class="count-badge" id="totalCount">총 0개</span>
+        <button class="dice-btn" onclick="showRandom()" title="랜덤 명대사">🎲</button>
+    </div>
+    <input type="text" id="search" class="search-bar" placeholder="포타 이름/키워드/해시태그/작가명/본문 입력" onkeyup="displayQuotes()">
 
     <div id="quoteList"></div>
 </div>
 
+<!-- Random Modal -->
+<div class="modal-overlay" id="randomModal" onclick="closeModalOutside(event)">
+    <div class="modal">
+        <button class="modal-close" onclick="document.getElementById('randomModal').classList.remove('active')">✕</button>
+        <div id="randomContent"></div>
+    </div>
+</div>
+
 <script>
     let quotes = JSON.parse(localStorage.getItem('myQuotes')) || [];
+    let liked = JSON.parse(localStorage.getItem('myLiked')) || [];
+
     displayQuotes();
 
+    function parseTags(tagStr) {
+        if (!tagStr) return [];
+        return tagStr.split('#').map(t => t.trim()).filter(t => t.length > 0);
+    }
+
     function addQuote() {
-        const title = document.getElementById('title').value;
-        const author = document.getElementById('author').value;
-        const quote = document.getElementById('quote').value;
-        const tags = document.getElementById('tags').value;
+        const author = document.getElementById('author').value.trim();
+        const title = document.getElementById('title').value.trim();
+        const quote = document.getElementById('quote').value.trim();
+        const tags = document.getElementById('tags').value.trim();
 
-        if(!title || !quote) return alert("제목과 대사는 필수입니다!");
+        if (!author || !quote) return alert("작가명과 명대사는 필수입니다!");
 
-        const newQuote = { id: Date.now(), title, author, quote, tags };
+        const newQuote = { id: Date.now(), author, title, quote, tags };
         quotes.push(newQuote);
         localStorage.setItem('myQuotes', JSON.stringify(quotes));
-        
-        document.querySelectorAll('input, textarea').forEach(input => input.value = '');
+
+        document.getElementById('author').value = '';
+        document.getElementById('title').value = '';
+        document.getElementById('quote').value = '';
+        document.getElementById('tags').value = '';
         displayQuotes();
     }
 
@@ -73,30 +130,116 @@
         const list = document.getElementById('quoteList');
         list.innerHTML = '';
 
-        const filtered = quotes.filter(q => 
-            q.title.toLowerCase().includes(searchTerm) || 
-            q.author.toLowerCase().includes(searchTerm) || 
-            q.tags.toLowerCase().includes(searchTerm) ||
-            q.quote.toLowerCase().includes(searchTerm)
-        );
+        document.getElementById('totalCount').textContent = `총 ${quotes.length}개`;
 
-        filtered.reverse().forEach(q => {
+        const filtered = quotes.filter(q => {
+            const tagStr = (q.tags || '').toLowerCase();
+            return (
+                (q.title || '').toLowerCase().includes(searchTerm) ||
+                (q.author || '').toLowerCase().includes(searchTerm) ||
+                tagStr.includes(searchTerm) ||
+                (q.quote || '').toLowerCase().includes(searchTerm)
+            );
+        });
+
+        [...filtered].reverse().forEach(q => {
+            const isLiked = liked.includes(q.id);
+            const tags = parseTags(q.tags);
+            const tagHTML = tags.map(t => `<span class="tag">#${t}</span>`).join('');
+            const infoText = [q.author, q.title].filter(Boolean).join(' | ');
+
             list.innerHTML += `
-                <div class="quote-card">
-                    <button class="delete-btn" onclick="deleteQuote(${q.id})">✕</button>
+                <div class="quote-card" id="card-${q.id}">
+                    <div class="card-actions">
+                        <button class="icon-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike(${q.id})">${isLiked ? '❤️' : '🤍'}</button>
+                        <button class="icon-btn" onclick="toggleEdit(${q.id})" id="edit-btn-${q.id}" title="수정">✏️</button>
+                        <button class="delete-btn" onclick="deleteQuote(${q.id})">✕</button>
+                    </div>
                     <div class="quote-text">${q.quote}</div>
-                    <div class="quote-info"><strong>${q.title}</strong> | ${q.author}</div>
-                    <div class="tag">#${q.tags}</div>
+                    <div class="quote-info">${infoText}</div>
+                    <div class="tag-container">${tagHTML}</div>
+                    <div class="edit-form" id="edit-${q.id}" style="display:none;">
+                        <input type="text" id="ea-${q.id}" value="${escapeAttr(q.author || '')}" placeholder="작가명">
+                        <input type="text" id="et-${q.id}" value="${escapeAttr(q.title || '')}" placeholder="포타 이름">
+                        <textarea id="eq-${q.id}" rows="3" placeholder="명대사 입력">${escapeText(q.quote)}</textarea>
+                        <input type="text" id="eg-${q.id}" value="${escapeAttr(q.tags || '')}" placeholder="#태그">
+                        <button class="save-edit-btn" onclick="saveEdit(${q.id})">저장</button>
+                    </div>
                 </div>
             `;
         });
     }
 
+    function escapeAttr(str) {
+        return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function escapeText(str) {
+        return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function toggleLike(id) {
+        if (liked.includes(id)) {
+            liked = liked.filter(l => l !== id);
+        } else {
+            liked.push(id);
+        }
+        localStorage.setItem('myLiked', JSON.stringify(liked));
+        displayQuotes();
+    }
+
+    function toggleEdit(id) {
+        const editForm = document.getElementById(`edit-${id}`);
+        const editBtn = document.getElementById(`edit-btn-${id}`);
+        const isHidden = editForm.style.display === 'none';
+        editForm.style.display = isHidden ? 'block' : 'none';
+        editBtn.classList.toggle('editing', isHidden);
+    }
+
+    function saveEdit(id) {
+        const newAuthor = document.getElementById(`ea-${id}`).value.trim();
+        const newTitle = document.getElementById(`et-${id}`).value.trim();
+        const newQuote = document.getElementById(`eq-${id}`).value.trim();
+        const newTags = document.getElementById(`eg-${id}`).value.trim();
+
+        if (!newAuthor || !newQuote) return alert("작가명과 명대사는 필수입니다!");
+
+        quotes = quotes.map(q => q.id === id
+            ? { ...q, author: newAuthor, title: newTitle, quote: newQuote, tags: newTags }
+            : q
+        );
+        localStorage.setItem('myQuotes', JSON.stringify(quotes));
+        displayQuotes();
+    }
+
     function deleteQuote(id) {
-        if(confirm("이 대사를 삭제할까요?")) {
+        if (confirm("이 대사를 삭제할까요?")) {
             quotes = quotes.filter(q => q.id !== id);
+            liked = liked.filter(l => l !== id);
             localStorage.setItem('myQuotes', JSON.stringify(quotes));
+            localStorage.setItem('myLiked', JSON.stringify(liked));
             displayQuotes();
+        }
+    }
+
+    function showRandom() {
+        if (quotes.length === 0) return;
+        const q = quotes[Math.floor(Math.random() * quotes.length)];
+        const tags = parseTags(q.tags);
+        const tagHTML = tags.map(t => `<span class="tag">#${t}</span>`).join('');
+        const infoText = [q.author, q.title].filter(Boolean).join(' | ');
+
+        document.getElementById('randomContent').innerHTML = `
+            <div class="modal-quote-text">${q.quote}</div>
+            <div class="modal-quote-info">${infoText}</div>
+            <div class="modal-tags tag-container">${tagHTML}</div>
+        `;
+        document.getElementById('randomModal').classList.add('active');
+    }
+
+    function closeModalOutside(event) {
+        if (event.target === document.getElementById('randomModal')) {
+            document.getElementById('randomModal').classList.remove('active');
         }
     }
 </script>
