@@ -7,48 +7,58 @@
     <title>포타 기록</title>
     <style>
         :root {
-            --primary-color: #5dcecc;
+            --primary-color: #5dcecc; /* 연한 하늘/청록 색상 */
             --bg-color: #f8f9fa;
         }
         body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-color); padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .container { max-width: 600px; width: 100%; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         h1 { text-align: center; color: var(--primary-color); font-size: 1.5rem; }
 
-        .input-group { margin-bottom: 15px; }
-        input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        button:hover { opacity: 0.9; }
+```
+    /* 입력창 스타일 */
+    .input-group { margin-bottom: 15px; }
+    input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+    button { width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+    button:hover { opacity: 0.9; }
 
-        .search-bar { margin: 20px 0; padding: 10px; border: 2px solid var(--primary-color); }
+    /* 검색창 스타일 */
+    .search-bar { margin: 20px 0; padding: 10px; border: 2px solid var(--primary-color); }
 
-        .quote-card { background: #fff; border-left: 5px solid var(--primary-color); padding: 15px; margin-bottom: 15px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; }
-        .quote-text { font-size: 1.1rem; font-weight: 600; margin-bottom: 10px; line-height: 1.5; }
-        .quote-info { font-size: 0.85rem; color: #666; }
-        .tag { display: inline-block; background: #eee; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; margin-top: 5px; color: var(--primary-color); }
-        .delete-btn { position: absolute; top: 10px; right: 10px; color: #ccc; cursor: pointer; border: none; background: none; }
-    </style>
+    /* 리스트 스타일 */
+    .quote-card { background: #fff; border-left: 5px solid var(--primary-color); padding: 15px; margin-bottom: 15px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; }
+    .quote-text { font-size: 1.1rem; font-weight: 600; margin-bottom: 10px; line-height: 1.5; }
+    .quote-info { font-size: 0.85rem; color: #666; }
+    .tag { display: inline-block; background: #eee; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; margin-top: 5px; color: var(--primary-color); }
+    .delete-btn { position: absolute; top: 10px; right: 10px; color: #ccc; cursor: pointer; border: none; background: none; }
+</style>
+```
+
 </head>
 <body>
 
 <div class="container">
     <h1>포타 기록</h1>
 
-    <div class="input-group">
-        <input type="text" id="title" placeholder="제목">
-        <input type="text" id="author" placeholder="작가명">
-        <textarea id="quote" rows="3" placeholder="명대사"></textarea>
-        <input type="text" id="tags" placeholder="태그">
-        <button onclick="addQuote()">저장하기</button>
-    </div>
+```
+<div class="input-group">
+    <input type="text" id="title" placeholder="제목">
+    <input type="text" id="author" placeholder="작가명">
+    <textarea id="quote" rows="3" placeholder="명대사"></textarea>
+    <input type="text" id="tags" placeholder="태그">
+    <button onclick="addQuote()">저장하기</button>
+</div>
 
-    <hr>
+<hr>
 
-    <input type="text" id="search" class="search-bar" placeholder="제목, 작가, 태그로 검색해보세요!" onkeyup="displayQuotes()">
+<input type="text" id="search" class="search-bar" placeholder="제목, 작가, 태그로 검색해보세요!" onkeyup="displayQuotes()">
 
-    <div id="quoteList"></div>
+<div id="quoteList"></div>
+```
+
 </div>
 
 <script>
+    // 페이지 로드 시 데이터 불러오기
     let quotes = JSON.parse(localStorage.getItem('myQuotes')) || [];
     displayQuotes();
 
@@ -64,6 +74,7 @@
         quotes.push(newQuote);
         localStorage.setItem('myQuotes', JSON.stringify(quotes));
         
+        // 입력창 비우기
         document.querySelectorAll('input, textarea').forEach(input => input.value = '');
         displayQuotes();
     }
