@@ -124,12 +124,12 @@
         return tagStr.split('#').map(t => t.trim()).filter(t => t.length > 0);
     }
 
-function buildInfoText(author, title) {
-    const parts = [];
-    if (title) parts.push(`<strong>${title}</strong>`);
-    if (author) parts.push(author);
-    return parts.join(' | ');
-}
+    function buildInfoText(author, title) {
+        const parts = [];
+        if (title) parts.push(`<strong>${title}</strong>`);
+        if (author) parts.push(author);
+        return parts.join(' | ');
+    }
 
     function addQuote() {
         const author = document.getElementById('author').value.trim();
