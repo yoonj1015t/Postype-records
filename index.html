@@ -92,7 +92,7 @@
                 </svg>
             </button>
         </div>
-        <input type="text" id="search" class="search-bar" placeholder="포타 이름/키워드/해시태그/작가명/본문 입력" onkeyup="displayQuotes()">
+        <input type="text" id="search" class="search-bar" placeholder="제목/작가명/씨피명/키워드 입력" onkeyup="displayQuotes()">
         <div id="quoteList"></div>
     </div>
 
@@ -123,6 +123,13 @@
         if (!tagStr) return [];
         return tagStr.split('#').map(t => t.trim()).filter(t => t.length > 0);
     }
+
+function buildInfoText(author, title) {
+    const parts = [];
+    if (title) parts.push(`<strong>${title}</strong>`);
+    if (author) parts.push(author);
+    return parts.join(' | ');
+}
 
     function addQuote() {
         const author = document.getElementById('author').value.trim();
@@ -164,7 +171,8 @@
             const isLiked = liked.includes(q.id);
             const tags = parseTags(q.tags);
             const tagHTML = tags.map(t => `<span class="tag">#${t}</span>`).join('');
-            const infoText = [q.author, q.title].filter(Boolean).join(' | ');
+            const infoText = buildInfoText(q.author, q.title);
+
 
             list.innerHTML += `
                 <div class="quote-card" id="card-${q.id}">
@@ -245,7 +253,8 @@
         const q = quotes[Math.floor(Math.random() * quotes.length)];
         const tags = parseTags(q.tags);
         const tagHTML = tags.map(t => `<span class="tag">#${t}</span>`).join('');
-        const infoText = [q.author, q.title].filter(Boolean).join(' | ');
+        const infoText = buildInfoText(q.author, q.title);
+
 
         document.getElementById('randomContent').innerHTML = `
             <div class="modal-quote-text">${q.quote}</div>
