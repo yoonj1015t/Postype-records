@@ -185,8 +185,9 @@
                     <div class="quote-info">${infoText}</div>
                     <div class="tag-container">${tagHTML}</div>
                     <div class="edit-form" id="edit-${q.id}" style="display:none;">
-                        <input type="text" id="ea-${q.id}" value="${escapeAttr(q.title || '')}" placeholder="제목">
-                        <input type="text" id="et-${q.id}" value="${escapeAttr(q.author || '')}" placeholder="작가명">
+                        <input type="text" id="et-${q.id}" value="${escapeAttr(q.title || '')}" placeholder="제목">
+                        <input type="text" id="ea-${q.id}" value="${escapeAttr(q.author || '')}" placeholder="작가명">
+
                         <textarea id="eq-${q.id}" rows="3" placeholder="명대사 입력">${escapeText(q.quote)}</textarea>
                         <input type="text" id="eg-${q.id}" value="${escapeAttr(q.tags || '')}" placeholder="태그">
                         <button class="save-edit-btn" onclick="saveEdit(${q.id})">저장</button>
