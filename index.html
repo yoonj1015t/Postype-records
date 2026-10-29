@@ -94,8 +94,8 @@
         </div>
         <input type="text" id="search" class="search-bar" placeholder="제목/작가명/씨피명/키워드 입력" onkeyup="displayQuotes()">
        <div style="display:flex;gap:8px;margin-bottom:8px;">
-  <button class="add-btn" style="margin:0" onclick="exportData()">백업 저장</button>
-  <button class="add-btn" style="margin:0" onclick="document.getElementById('importFile').click()">백업 불러오기</button>
+  <button class="add-btn" style="margin:0;flex:1" onclick="exportData()">백업 저장</button>
+  <button class="add-btn" style="margin:0;flex:1" onclick="document.getElementById('importFile').click()">백업 불러오기</button>
   <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
 </div>
         <div id="quoteList"></div>
